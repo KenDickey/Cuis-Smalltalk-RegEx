@@ -1,12 +1,16 @@
-'From Cuis 5.0 of 7 November 2016 [latest update: #2984] on 25 November 2016 at 4:37:34 pm'!
+'From Cuis 5.0 [latest update: #4360] on 24 November 2020 at 7:46:12 pm'!
 'Description Reguar expression matching.
 See RegEx-Core RxParser class DOCUMENTATION methods and examples in Regex-Tests-Core.
 Copyright is in RegEx-Core RxParser class DOCUMENTATION f:boringStuff:
   ''The Regular Expression Matcher (``The Software'''') is Copyright (C) 1996, 1999 Vassili Bykov. '' 
  '!
-!provides: 'Regex-Core' 1 7!
+!provides: 'Regex-Core' 1 9!
 !requires: 'Cuis-Base' 50 2974 nil!
 !requires: 'SqueakCompatibility' 1 27 nil!
+SystemOrganization addCategory: #'Regex-Core-Exceptions'!
+SystemOrganization addCategory: #'Regex-Core'!
+
+
 !classDefinition: #RegexError category: #'Regex-Core-Exceptions'!
 Error subclass: #RegexError
 	instanceVariableNames: ''
@@ -487,99 +491,6 @@ Instance variables:
 	branch		<RxsBranch>
 	regex		<RxsRegex | RxsEpsilon>!
 
-!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:31'!
-allRangesOfRegexMatches: rxString
-
-	^rxString asRegex matchingRangesIn: self! !
-
-!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:32'!
-allRegexMatches: rxString
-
-	^rxString asRegex matchesIn: self! !
-
-!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:32'!
-asRegex
-	"Compile the receiver as a regex matcher. May raise RxParser>>syntaxErrorSignal
-	or RxParser>>compilationErrorSignal.
-	This is a part of the Regular Expression Matcher package, (c) 1996, 1999 Vassili Bykov.
-	Refer to `documentation' protocol of RxParser class for details."
-
-	^RxParser preferredMatcherClass for: (RxParser new parse: self)! !
-
-!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:33'!
-asRegexIgnoringCase
-	"Compile the receiver as a regex matcher. May raise RxParser>>syntaxErrorSignal
-	or RxParser>>compilationErrorSignal.
-	This is a part of the Regular Expression Matcher package, (c) 1996, 1999 Vassili Bykov.
-	Refer to `documentation' protocol of RxParser class for details."
-
-	^RxParser preferredMatcherClass
-		for: (RxParser new parse: self)
-		ignoreCase: true! !
-
-!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:33'!
-copyWithRegex: rxString matchesReplacedWith: aString
-
-	^rxString asRegex
-		copy: self replacingMatchesWith: aString! !
-
-!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:33'!
-copyWithRegex: rxString matchesTranslatedUsing: aBlock
-
-	^rxString asRegex
-		copy: self translatingMatchesUsing: aBlock! !
-
-!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:34'!
-matchesRegex: regexString
-	"Test if the receiver matches a regex.  May raise RxParser>>regexErrorSignal or
-	child signals.
-	This is a part of the Regular Expression Matcher package, (c) 1996, 1999 Vassili Bykov.
-	Refer to `documentation' protocol of RxParser class for details."
-
-	^regexString asRegex matches: self! !
-
-!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:34'!
-matchesRegexIgnoringCase: regexString
-	"Test if the receiver matches a regex.  May raise RxParser>>regexErrorSignal or
-	child signals.
-	This is a part of the Regular Expression Matcher package, (c) 1996, 1999 Vassili Bykov.
-	Refer to `documentation' protocol of RxParser class for details."
-
-	^regexString asRegexIgnoringCase matches: self! !
-
-!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:34'!
-prefixMatchesRegex: regexString
-	"Test if the receiver's prefix matches a regex.	
-	May raise RxParser class>>regexErrorSignal or child signals.
-	This is a part of the Regular Expression Matcher package, (c) 1996, 1999 Vassili Bykov.
-	Refer to `documentation' protocol of RxParser class for details."
-
-	^regexString asRegex matchesPrefix: self! !
-
-!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:35'!
-prefixMatchesRegexIgnoringCase: regexString
-	"Test if the receiver's prefix matches a regex.	
-	May raise RxParser class>>regexErrorSignal or child signals.
-	This is a part of the Regular Expression Matcher package, (c) 1996, 1999 Vassili Bykov.
-	Refer to `documentation' protocol of RxParser class for details."
-
-	^regexString asRegexIgnoringCase matchesPrefix: self! !
-
-!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:35'!
-regex: rxString matchesCollect: aBlock
-
-	^rxString asRegex matchesIn: self collect: aBlock! !
-
-!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:35'!
-regex: rxString matchesDo: aBlock
-
-	^rxString asRegex matchesIn: self do: aBlock! !
-
-!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:36'!
-search: aString
-	"compatibility method to make regexp and strings work polymorphicly"
-	^ aString includesSubString: self! !
-
 !RxCharSetParser methodsFor: 'parsing' stamp: 'vb 4/11/09 21:56'!
 addChar: aChar
 
@@ -592,30 +503,19 @@ addRangeFrom: firstChar to: lastChar
 		[RxParser signalSyntaxException: ' bad character range'].
 	elements add: (RxsRange from: firstChar to: lastChar)! !
 
-!RxCharSetParser methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
-initialize: aStream
-
-	source := aStream.
-	lookahead := aStream next.
-	elements := OrderedCollection new! !
-
-!RxCharSetParser methodsFor: 'parsing' stamp: 'vb 4/11/09 21:56'!
+!RxCharSetParser methodsFor: 'parsing' stamp: 'DF 10/21/2020 20:49:11'!
 match: aCharacter
 
 	aCharacter = lookahead
-		ifFalse: [RxParser signalSyntaxException: 'unexpected character: ', (String with: lookahead)].
+		ifFalse: [
+			RxParser signalSyntaxException:
+				(lookahead 
+					ifNil:['missing character']
+					ifNotNil:['unexpected character: ', (String with: lookahead)])
+			].
 	^source atEnd
 		ifTrue: [lookahead := nil]
 		ifFalse: [lookahead := source next]! !
-
-!RxCharSetParser methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
-parse
-
-	lookahead = $- ifTrue:
-		[self addChar: $-.
-		self match: $-].
-	[lookahead isNil] whileFalse: [self parseStep].
-	^elements! !
 
 !RxCharSetParser methodsFor: 'parsing' stamp: 'vb 4/11/09 21:56'!
 parseCharOrRange
@@ -664,6 +564,22 @@ parseStep
 		[RxParser signalSyntaxException: 'invalid range'].
 	self parseCharOrRange! !
 
+!RxCharSetParser methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
+initialize: aStream
+
+	source := aStream.
+	lookahead := aStream next.
+	elements := OrderedCollection new! !
+
+!RxCharSetParser methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
+parse
+
+	lookahead = $- ifTrue:
+		[self addChar: $-.
+		self match: $-].
+	[lookahead isNil] whileFalse: [self parseStep].
+	^elements! !
+
 !RxCharSetParser class methodsFor: 'instance creation' stamp: 'vb 4/11/09 21:56'!
 on: aStream
 
@@ -703,48 +619,6 @@ conditionTester
 			[:conditionSelector |
 			matcher perform: conditionSelector]]! !
 
-!RxMatchOptimizer methodsFor: 'private' stamp: 'KenD 11/25/2016 15:58:02'!
-determineTestMethod
-	"Answer a block closure that will work as a can-match predicate.
-	Answer nil if no viable optimization is possible (too many chars would
-	be able to start a match)."
-
-	| testers |
-	(conditions includes: #any) ifTrue: [^nil].
-	testers := OrderedCollection new: 5.
-	#(#prefixTester #nonPrefixTester #conditionTester #methodPredicateTester #nonMethodPredicateTester #predicateTester #nonPredicateTester)
-		do: 
-			[:selector | 
-			| tester |
-			tester := self perform: selector.
-			tester notNil ifTrue: [testers add: tester]].
-	testers isEmpty ifTrue: [^nil].
-	testers size = 1 ifTrue: [^testers first].
-	testers := testers asArray.
-	"^[:char :matcher | testers includes: [:t | t value: char value: matcher]]"
-	^ [:char :matcher | testers anySatisfy: [:t | t value: char value: matcher]]! !
-
-!RxMatchOptimizer methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
-initialize: aRegex ignoreCase: aBoolean 
-	"Set `testMethod' variable to a can-match predicate block:
-	two-argument block which accepts a lookahead character
-	and a matcher (presumably built from aRegex) and answers 
-	a boolean indicating whether a match could start at the given
-	lookahead. "
-
-	ignoreCase := aBoolean.
-	prefixes := Set new: 10.
-	nonPrefixes := Set new: 10.
-	conditions := Set new: 3.
-	methodPredicates := Set new: 3.
-	nonMethodPredicates := Set new: 3.
-	predicates := Set new: 3.
-	nonPredicates := Set new: 3.
-	aRegex dispatchTo: self.	"If the whole expression is nullable, 
-		end-of-line is an implicit can-match condition!!"
-	aRegex isNullable ifTrue: [conditions add: #atEndOfLine].
-	testBlock := self determineTestMethod! !
-
 !RxMatchOptimizer methodsFor: 'accessing' stamp: 'KenD 11/22/2016 13:09:10'!
 methodPredicateTester
 	| p selector |
@@ -777,6 +651,27 @@ nonMethodPredicateTester
 			[[:char :m | 
 			RxParser doHandlingMessageNotUnderstood:
 				[p includes: [:sel | (char perform: sel) not]]]]! !
+
+!RxMatchOptimizer methodsFor: 'private' stamp: 'KenD 11/25/2016 15:58:02'!
+determineTestMethod
+	"Answer a block closure that will work as a can-match predicate.
+	Answer nil if no viable optimization is possible (too many chars would
+	be able to start a match)."
+
+	| testers |
+	(conditions includes: #any) ifTrue: [^nil].
+	testers := OrderedCollection new: 5.
+	#(#prefixTester #nonPrefixTester #conditionTester #methodPredicateTester #nonMethodPredicateTester #predicateTester #nonPredicateTester)
+		do: 
+			[:selector | 
+			| tester |
+			tester := self perform: selector.
+			tester notNil ifTrue: [testers add: tester]].
+	testers isEmpty ifTrue: [^nil].
+	testers size = 1 ifTrue: [^testers first].
+	testers := testers asArray.
+	"^[:char :matcher | testers includes: [:t | t value: char value: matcher]]"
+	^ [:char :matcher | testers anySatisfy: [:t | t value: char value: matcher]]! !
 
 !RxMatchOptimizer methodsFor: 'private' stamp: 'KenD 11/22/2016 13:09:20'!
 nonPredicateTester
@@ -841,6 +736,27 @@ prefixTester
 			[ignoreCase
 				ifTrue: [[:char :matcher | p includes: char asUppercase]]
 				ifFalse: [[:char :matcher | p includes: char]]]! !
+
+!RxMatchOptimizer methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
+initialize: aRegex ignoreCase: aBoolean 
+	"Set `testMethod' variable to a can-match predicate block:
+	two-argument block which accepts a lookahead character
+	and a matcher (presumably built from aRegex) and answers 
+	a boolean indicating whether a match could start at the given
+	lookahead. "
+
+	ignoreCase := aBoolean.
+	prefixes := Set new: 10.
+	nonPrefixes := Set new: 10.
+	conditions := Set new: 3.
+	methodPredicates := Set new: 3.
+	nonMethodPredicates := Set new: 3.
+	predicates := Set new: 3.
+	nonPredicates := Set new: 3.
+	aRegex dispatchTo: self.	"If the whole expression is nullable, 
+		end-of-line is an implicit can-match condition!!"
+	aRegex isNullable ifTrue: [conditions add: #atEndOfLine].
+	testBlock := self determineTestMethod! !
 
 !RxMatchOptimizer methodsFor: 'double dispatch' stamp: 'vb 4/11/09 21:56'!
 syntaxAny
@@ -946,129 +862,6 @@ allocateMarker
 	markerCount := markerCount + 1.
 	^markerCount! !
 
-!RxMatcher methodsFor: 'testing' stamp: 'KenD 11/25/2016 16:06:50'!
-atBeginningOfLine
-
-	^self position = 0 or: [self lastChar isLineSeparator]! !
-
-!RxMatcher methodsFor: 'testing' stamp: 'lr 1/15/2010 21:12'!
-atBeginningOfWord
-
-	^(self isWordChar: self lastChar) not
-		and: [self isWordChar: stream peek]! !
-
-!RxMatcher methodsFor: 'streaming' stamp: 'vb 4/11/09 21:56'!
-atEnd
-
-	^stream atEnd! !
-
-!RxMatcher methodsFor: 'testing' stamp: 'KenD 11/25/2016 16:07:03'!
-atEndOfLine
-
-	^self atEnd or: [stream peek isLineSeparator]! !
-
-!RxMatcher methodsFor: 'testing' stamp: 'lr 1/15/2010 21:12'!
-atEndOfWord
-
-	^(self isWordChar: self lastChar)
-		and: [(self isWordChar: stream peek) not]! !
-
-!RxMatcher methodsFor: 'testing' stamp: 'lr 1/15/2010 21:12'!
-atWordBoundary
-
-	^(self isWordChar: self lastChar)
-		xor: (self isWordChar: stream peek)! !
-
-!RxMatcher methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
-buildFrom: aSyntaxTreeRoot
-	"Private - Entry point of matcher build process."
-
-	markerCount := 0.  "must go before #dispatchTo: !!"
-	matcher := aSyntaxTreeRoot dispatchTo: self.
-	matcher terminateWith: RxmTerminator new! !
-
-!RxMatcher methodsFor: 'match enumeration' stamp: 'vb 4/11/09 21:56'!
-copy: aString replacingMatchesWith: replacementString
-	"Copy <aString>, except for the matches. Replace each match with <aString>."
-
-	| answer |
-	answer := (String new: 40) writeStream.
-	self
-		copyStream: aString readStream
-		to: answer
-		replacingMatchesWith: replacementString.
-	^answer contents! !
-
-!RxMatcher methodsFor: 'match enumeration' stamp: 'vb 4/11/09 21:56'!
-copy: aString translatingMatchesUsing: aBlock
-	"Copy <aString>, except for the matches. For each match, evaluate <aBlock> passing the matched substring as the argument.  Expect the block to answer a String, and replace the match with the answer."
-
-	| answer |
-	answer := (String new: 40) writeStream.
-	self copyStream: aString readStream to: answer translatingMatchesUsing: aBlock.
-	^answer contents! !
-
-!RxMatcher methodsFor: 'match enumeration' stamp: 'lr 1/15/2010 21:45'!
-copyStream: aStream to: writeStream replacingMatchesWith: aString
-	"Copy the contents of <aStream> on the <writeStream>, except for the matches. Replace each match with <aString>."
-
-	| searchStart matchStart matchEnd |
-	stream := aStream.
-	markerPositions := nil.
-	[searchStart := aStream position.
-	self proceedSearchingStream: aStream] whileTrue:
-		[matchStart := (self subBeginning: 1) first.
-		matchEnd := (self subEnd: 1) first.
-		aStream position: searchStart.
-		searchStart to: matchStart - 1 do:
-			[:ignoredPos | writeStream nextPut: aStream next].
-		writeStream nextPutAll: aString.
-		aStream position: matchEnd.
-		"Be extra careful about successful matches which consume no input.
-		After those, make sure to advance or finish if already at end."
-		matchEnd = searchStart ifTrue: 
-			[aStream atEnd
-				ifTrue:	[^self "rest after end of whileTrue: block is a no-op if atEnd"]
-				ifFalse:	[writeStream nextPut: aStream next]]].
-	aStream position: searchStart.
-	[aStream atEnd] whileFalse: [writeStream nextPut: aStream next]! !
-
-!RxMatcher methodsFor: 'match enumeration' stamp: 'lr 1/15/2010 21:45'!
-copyStream: aStream to: writeStream translatingMatchesUsing: aBlock
-	"Copy the contents of <aStream> on the <writeStream>, except for the matches. For each match, evaluate <aBlock> passing the matched substring as the argument.  Expect the block to answer a String, and write the answer to <writeStream> in place of the match."
-
-	| searchStart matchStart matchEnd match |
-	stream := aStream.	
-	markerPositions := nil.
-	[searchStart := aStream position.
-	self proceedSearchingStream: aStream] whileTrue:
-		[matchStart := (self subBeginning: 1) first.
-		matchEnd := (self subEnd: 1) first.
-		aStream position: searchStart.
-		searchStart to: matchStart - 1 do:
-			[:ignoredPos | writeStream nextPut: aStream next].
-		match := (String new: matchEnd - matchStart + 1) writeStream.
-		matchStart to: matchEnd - 1 do:
-			[:ignoredPos | match nextPut: aStream next].
-		writeStream nextPutAll: (aBlock value: match contents).
-		"Be extra careful about successful matches which consume no input.
-		After those, make sure to advance or finish if already at end."
-		matchEnd = searchStart ifTrue: 
-			[aStream atEnd
-				ifTrue:	[^self "rest after end of whileTrue: block is a no-op if atEnd"]
-				ifFalse:	[writeStream nextPut: aStream next]]].
-	aStream position: searchStart.
-	[aStream atEnd] whileFalse: [writeStream nextPut: aStream next]! !
-
-!RxMatcher methodsFor: 'privileged' stamp: 'lr 1/15/2010 21:13'!
-currentState
-	"Answer an opaque object that can later be used to restore the
-	matcher's state (for backtracking)."
-
-	| origPosition origLastChar |
-	origPosition := stream position.
-	^	[stream position: origPosition]! !
-
 !RxMatcher methodsFor: 'private' stamp: 'vb 4/11/09 21:56'!
 hookBranchOf: regexNode onto: endMarker
 	"Private - Recurse down the chain of regexes starting at
@@ -1086,18 +879,6 @@ hookBranchOf: regexNode onto: endMarker
 		alternative: rest;
 		yourself! !
 
-!RxMatcher methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
-initialize: syntaxTreeRoot ignoreCase: aBoolean
-	"Compile thyself for the regex with the specified syntax tree.
-	See comment and `building' protocol in this class and 
-	#dispatchTo: methods in syntax tree components for details 
-	on double-dispatch building. 
-	The argument is supposedly a RxsRegex."
-
-	ignoreCase := aBoolean.
-	self buildFrom: syntaxTreeRoot.
-	startOptimizer := RxMatchOptimizer new initialize: syntaxTreeRoot ignoreCase: aBoolean! !
-
 !RxMatcher methodsFor: 'private' stamp: 'vb 4/11/09 21:56'!
 isWordChar: aCharacterOrNil
 	"Answer whether the argument is a word constituent character:
@@ -1105,16 +886,6 @@ isWordChar: aCharacterOrNil
 
 	^aCharacterOrNil ~~ nil
 		and: [aCharacterOrNil isAlphaNumeric]! !
-
-!RxMatcher methodsFor: 'accessing' stamp: 'lr 1/15/2010 21:14'!
-lastChar
-	^ stream position = 0
-		ifFalse: [ stream skip: -1; next ]! !
-
-!RxMatcher methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
-lastResult
-
-	^lastResult! !
 
 !RxMatcher methodsFor: 'private' stamp: 'vb 4/11/09 21:56'!
 makeOptional: aMatcher
@@ -1156,84 +927,117 @@ makeStar: aMatcher
 	aMatcher pointTailTo: loopback.
 	^detour! !
 
-!RxMatcher methodsFor: 'privileged' stamp: 'vb 4/11/09 21:56'!
-markerPositionAt: anIndex add: position
-	"Remember position of another instance of the given marker."
+!RxMatcher methodsFor: 'private' stamp: 'lr 1/15/2010 21:17'!
+proceedSearchingStream: aStream
 
-	(markerPositions at: anIndex) addFirst: position! !
+	| position |
+	position := aStream position.
+	[aStream atEnd] whileFalse:
+		[self tryMatch ifTrue: [^true].
+		aStream position: position; next.
+		position := aStream position].
+	"Try match at the very stream end too!!"
+	self tryMatch ifTrue: [^true]. 
+	^false! !
+
+!RxMatcher methodsFor: 'private' stamp: 'lr 1/15/2010 21:51'!
+tryMatch
+	"Match thyself against the current stream."
+
+	| oldMarkerPositions |
+	oldMarkerPositions := markerPositions.
+	markerPositions := Array new: markerCount.
+	1 to: markerCount do: [ :i | markerPositions at: i put: OrderedCollection new ].
+	lastResult := startOptimizer isNil
+		ifTrue: [ matcher matchAgainst: self]
+		ifFalse: [ (startOptimizer canStartMatch: stream peek in: self) and: [ matcher matchAgainst: self ] ].
+	"check for duplicates"
+	(lastResult not or: [ oldMarkerPositions isNil or: [ oldMarkerPositions size ~= markerPositions size ] ])
+		ifTrue: [ ^ lastResult ].
+	oldMarkerPositions with: markerPositions do: [ :oldPos :newPos |
+		oldPos size = newPos size 
+			ifFalse: [ ^ lastResult ].
+		oldPos with: newPos do: [ :old :new |
+			old = new
+				ifFalse: [ ^ lastResult ] ] ].
+	"this is a duplicate"
+	^ lastResult := false! !
+
+!RxMatcher methodsFor: 'testing' stamp: 'KenD 11/25/2016 16:06:50'!
+atBeginningOfLine
+
+	^self position = 0 or: [self lastChar isLineSeparator]! !
+
+!RxMatcher methodsFor: 'testing' stamp: 'lr 1/15/2010 21:12'!
+atBeginningOfWord
+
+	^(self isWordChar: self lastChar) not
+		and: [self isWordChar: stream peek]! !
+
+!RxMatcher methodsFor: 'testing' stamp: 'KenD 11/25/2016 16:07:03'!
+atEndOfLine
+
+	^self atEnd or: [stream peek isLineSeparator]! !
+
+!RxMatcher methodsFor: 'testing' stamp: 'lr 1/15/2010 21:12'!
+atEndOfWord
+
+	^(self isWordChar: self lastChar)
+		and: [(self isWordChar: stream peek) not]! !
+
+!RxMatcher methodsFor: 'testing' stamp: 'lr 1/15/2010 21:12'!
+atWordBoundary
+
+	^(self isWordChar: self lastChar)
+		xor: (self isWordChar: stream peek)! !
+
+!RxMatcher methodsFor: 'testing' stamp: 'vb 4/11/09 21:56'!
+notAtWordBoundary
+
+	^self atWordBoundary not! !
+
+!RxMatcher methodsFor: 'testing' stamp: 'vb 4/11/09 21:56'!
+supportsSubexpressions
+
+	^true! !
+
+!RxMatcher methodsFor: 'streaming' stamp: 'vb 4/11/09 21:56'!
+atEnd
+
+	^stream atEnd! !
+
+!RxMatcher methodsFor: 'streaming' stamp: 'lr 1/15/2010 21:13'!
+next
+	^ stream next! !
+
+!RxMatcher methodsFor: 'streaming' stamp: 'vb 4/11/09 21:56'!
+position
+
+	^stream position! !
+
+!RxMatcher methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
+buildFrom: aSyntaxTreeRoot
+	"Private - Entry point of matcher build process."
+
+	markerCount := 0.  "must go before #dispatchTo: !!"
+	matcher := aSyntaxTreeRoot dispatchTo: self.
+	matcher terminateWith: RxmTerminator new! !
+
+!RxMatcher methodsFor: 'accessing' stamp: 'lr 1/15/2010 21:14'!
+lastChar
+	^ stream position = 0
+		ifFalse: [ stream skip: -1; next ]! !
+
+!RxMatcher methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
+lastResult
+
+	^lastResult! !
 
 !RxMatcher methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
 matches: aString
 	"Match against a string."
 
 	^self matchesStream: aString readStream! !
-
-!RxMatcher methodsFor: 'match enumeration' stamp: 'vb 4/11/09 21:56'!
-matchesIn: aString
-	"Search aString repeatedly for the matches of the receiver.  Answer an OrderedCollection of all matches (substrings)."
-
-	| result |
-	result := OrderedCollection new.
-	self
-		matchesOnStream: aString readStream
-		do: [:match | result add: match].
-	^result! !
-
-!RxMatcher methodsFor: 'match enumeration' stamp: 'vb 4/11/09 21:56'!
-matchesIn: aString collect: aBlock
-	"Search aString repeatedly for the matches of the receiver.  Evaluate aBlock for each match passing the matched substring as the argument, collect evaluation results in an OrderedCollection, and return in. The following example shows how to use this message to split a string into words."
-	"'\w+' asRegex matchesIn: 'Now is the Time' collect: [:each | each asLowercase]"
-
-	| result |
-	result := OrderedCollection new.
-	self
-		matchesOnStream: aString readStream
-		do: [:match | result add: (aBlock value: match)].
-	^result! !
-
-!RxMatcher methodsFor: 'match enumeration' stamp: 'vb 4/11/09 21:56'!
-matchesIn: aString do: aBlock
-	"Search aString repeatedly for the matches of the receiver.
-	Evaluate aBlock for each match passing the matched substring
-	as the argument."
-
-	self
-		matchesOnStream: aString readStream
-		do: aBlock! !
-
-!RxMatcher methodsFor: 'match enumeration' stamp: 'vb 4/11/09 21:56'!
-matchesOnStream: aStream
-
-	| result |
-	result := OrderedCollection new.
-	self
-		matchesOnStream: aStream
-		do: [:match | result add: match].
-	^result! !
-
-!RxMatcher methodsFor: 'match enumeration' stamp: 'vb 4/11/09 21:56'!
-matchesOnStream: aStream collect: aBlock
-
-	| result |
-	result := OrderedCollection new.
-	self
-		matchesOnStream: aStream
-		do: [:match | result add: (aBlock value: match)].
-	^result! !
-
-!RxMatcher methodsFor: 'match enumeration' stamp: 'vb 4/11/09 21:56'!
-matchesOnStream: aStream do: aBlock
-	"Be extra careful about successful matches which consume no input.
-	After those, make sure to advance or finish if already at end."
-
-	| position |
-	[position := aStream position.
-	self searchStream: aStream] whileTrue:
-		[aBlock value: (self subexpression: 1).
-		position = aStream position ifTrue: 
-			[aStream atEnd
-				ifTrue: [^self]
-				ifFalse: [aStream next]]]! !
 
 !RxMatcher methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
 matchesPrefix: aString
@@ -1255,49 +1059,6 @@ matchesStreamPrefix: theStream
 	stream := theStream.
 	markerPositions := nil.
 	^self tryMatch! !
-
-!RxMatcher methodsFor: 'match enumeration' stamp: 'vb 4/11/09 21:56'!
-matchingRangesIn: aString
-	"Search aString repeatedly for the matches of the receiver.  Answer an OrderedCollection of ranges of each match (index of first character to: index of last character)."
-
-	| result |
-	result := OrderedCollection new.
-	self
-		matchesIn: aString 
-		do: [:match | result add: (self position - match size + 1 to: self position)].
-	^result! !
-
-!RxMatcher methodsFor: 'streaming' stamp: 'lr 1/15/2010 21:13'!
-next
-	^ stream next! !
-
-!RxMatcher methodsFor: 'testing' stamp: 'vb 4/11/09 21:56'!
-notAtWordBoundary
-
-	^self atWordBoundary not! !
-
-!RxMatcher methodsFor: 'streaming' stamp: 'vb 4/11/09 21:56'!
-position
-
-	^stream position! !
-
-!RxMatcher methodsFor: 'private' stamp: 'lr 1/15/2010 21:17'!
-proceedSearchingStream: aStream
-
-	| position |
-	position := aStream position.
-	[aStream atEnd] whileFalse:
-		[self tryMatch ifTrue: [^true].
-		aStream position: position; next.
-		position := aStream position].
-	"Try match at the very stream end too!!"
-	self tryMatch ifTrue: [^true]. 
-	^false! !
-
-!RxMatcher methodsFor: 'privileged' stamp: 'vb 4/11/09 21:56'!
-restoreState: aBlock
-
-	aBlock value! !
 
 !RxMatcher methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
 search: aString
@@ -1382,10 +1143,188 @@ subexpressions: subIndex
 	stream position: originalPosition.
 	^reply asArray! !
 
-!RxMatcher methodsFor: 'testing' stamp: 'vb 4/11/09 21:56'!
-supportsSubexpressions
+!RxMatcher methodsFor: 'match enumeration' stamp: 'vb 4/11/09 21:56'!
+copy: aString replacingMatchesWith: replacementString
+	"Copy <aString>, except for the matches. Replace each match with <aString>."
 
-	^true! !
+	| answer |
+	answer := (String new: 40) writeStream.
+	self
+		copyStream: aString readStream
+		to: answer
+		replacingMatchesWith: replacementString.
+	^answer contents! !
+
+!RxMatcher methodsFor: 'match enumeration' stamp: 'vb 4/11/09 21:56'!
+copy: aString translatingMatchesUsing: aBlock
+	"Copy <aString>, except for the matches. For each match, evaluate <aBlock> passing the matched substring as the argument.  Expect the block to answer a String, and replace the match with the answer."
+
+	| answer |
+	answer := (String new: 40) writeStream.
+	self copyStream: aString readStream to: answer translatingMatchesUsing: aBlock.
+	^answer contents! !
+
+!RxMatcher methodsFor: 'match enumeration' stamp: 'lr 1/15/2010 21:45'!
+copyStream: aStream to: writeStream replacingMatchesWith: aString
+	"Copy the contents of <aStream> on the <writeStream>, except for the matches. Replace each match with <aString>."
+
+	| searchStart matchStart matchEnd |
+	stream := aStream.
+	markerPositions := nil.
+	[searchStart := aStream position.
+	self proceedSearchingStream: aStream] whileTrue:
+		[matchStart := (self subBeginning: 1) first.
+		matchEnd := (self subEnd: 1) first.
+		aStream position: searchStart.
+		searchStart to: matchStart - 1 do:
+			[:ignoredPos | writeStream nextPut: aStream next].
+		writeStream nextPutAll: aString.
+		aStream position: matchEnd.
+		"Be extra careful about successful matches which consume no input.
+		After those, make sure to advance or finish if already at end."
+		matchEnd = searchStart ifTrue: 
+			[aStream atEnd
+				ifTrue:	[^self "rest after end of whileTrue: block is a no-op if atEnd"]
+				ifFalse:	[writeStream nextPut: aStream next]]].
+	aStream position: searchStart.
+	[aStream atEnd] whileFalse: [writeStream nextPut: aStream next]! !
+
+!RxMatcher methodsFor: 'match enumeration' stamp: 'lr 1/15/2010 21:45'!
+copyStream: aStream to: writeStream translatingMatchesUsing: aBlock
+	"Copy the contents of <aStream> on the <writeStream>, except for the matches. For each match, evaluate <aBlock> passing the matched substring as the argument.  Expect the block to answer a String, and write the answer to <writeStream> in place of the match."
+
+	| searchStart matchStart matchEnd match |
+	stream := aStream.	
+	markerPositions := nil.
+	[searchStart := aStream position.
+	self proceedSearchingStream: aStream] whileTrue:
+		[matchStart := (self subBeginning: 1) first.
+		matchEnd := (self subEnd: 1) first.
+		aStream position: searchStart.
+		searchStart to: matchStart - 1 do:
+			[:ignoredPos | writeStream nextPut: aStream next].
+		match := (String new: matchEnd - matchStart + 1) writeStream.
+		matchStart to: matchEnd - 1 do:
+			[:ignoredPos | match nextPut: aStream next].
+		writeStream nextPutAll: (aBlock value: match contents).
+		"Be extra careful about successful matches which consume no input.
+		After those, make sure to advance or finish if already at end."
+		matchEnd = searchStart ifTrue: 
+			[aStream atEnd
+				ifTrue:	[^self "rest after end of whileTrue: block is a no-op if atEnd"]
+				ifFalse:	[writeStream nextPut: aStream next]]].
+	aStream position: searchStart.
+	[aStream atEnd] whileFalse: [writeStream nextPut: aStream next]! !
+
+!RxMatcher methodsFor: 'match enumeration' stamp: 'vb 4/11/09 21:56'!
+matchesIn: aString
+	"Search aString repeatedly for the matches of the receiver.  Answer an OrderedCollection of all matches (substrings)."
+
+	| result |
+	result := OrderedCollection new.
+	self
+		matchesOnStream: aString readStream
+		do: [:match | result add: match].
+	^result! !
+
+!RxMatcher methodsFor: 'match enumeration' stamp: 'vb 4/11/09 21:56'!
+matchesIn: aString collect: aBlock
+	"Search aString repeatedly for the matches of the receiver.  Evaluate aBlock for each match passing the matched substring as the argument, collect evaluation results in an OrderedCollection, and return in. The following example shows how to use this message to split a string into words."
+	"'\w+' asRegex matchesIn: 'Now is the Time' collect: [:each | each asLowercase]"
+
+	| result |
+	result := OrderedCollection new.
+	self
+		matchesOnStream: aString readStream
+		do: [:match | result add: (aBlock value: match)].
+	^result! !
+
+!RxMatcher methodsFor: 'match enumeration' stamp: 'vb 4/11/09 21:56'!
+matchesIn: aString do: aBlock
+	"Search aString repeatedly for the matches of the receiver.
+	Evaluate aBlock for each match passing the matched substring
+	as the argument."
+
+	self
+		matchesOnStream: aString readStream
+		do: aBlock! !
+
+!RxMatcher methodsFor: 'match enumeration' stamp: 'vb 4/11/09 21:56'!
+matchesOnStream: aStream
+
+	| result |
+	result := OrderedCollection new.
+	self
+		matchesOnStream: aStream
+		do: [:match | result add: match].
+	^result! !
+
+!RxMatcher methodsFor: 'match enumeration' stamp: 'vb 4/11/09 21:56'!
+matchesOnStream: aStream collect: aBlock
+
+	| result |
+	result := OrderedCollection new.
+	self
+		matchesOnStream: aStream
+		do: [:match | result add: (aBlock value: match)].
+	^result! !
+
+!RxMatcher methodsFor: 'match enumeration' stamp: 'vb 4/11/09 21:56'!
+matchesOnStream: aStream do: aBlock
+	"Be extra careful about successful matches which consume no input.
+	After those, make sure to advance or finish if already at end."
+
+	| position |
+	[position := aStream position.
+	self searchStream: aStream] whileTrue:
+		[aBlock value: (self subexpression: 1).
+		position = aStream position ifTrue: 
+			[aStream atEnd
+				ifTrue: [^self]
+				ifFalse: [aStream next]]]! !
+
+!RxMatcher methodsFor: 'match enumeration' stamp: 'vb 4/11/09 21:56'!
+matchingRangesIn: aString
+	"Search aString repeatedly for the matches of the receiver.  Answer an OrderedCollection of ranges of each match (index of first character to: index of last character)."
+
+	| result |
+	result := OrderedCollection new.
+	self
+		matchesIn: aString 
+		do: [:match | result add: (self position - match size + 1 to: self position)].
+	^result! !
+
+!RxMatcher methodsFor: 'privileged' stamp: 'lr 1/15/2010 21:13'!
+currentState
+	"Answer an opaque object that can later be used to restore the
+	matcher's state (for backtracking)."
+
+	| origPosition origLastChar |
+	origPosition := stream position.
+	^	[stream position: origPosition]! !
+
+!RxMatcher methodsFor: 'privileged' stamp: 'vb 4/11/09 21:56'!
+markerPositionAt: anIndex add: position
+	"Remember position of another instance of the given marker."
+
+	(markerPositions at: anIndex) addFirst: position! !
+
+!RxMatcher methodsFor: 'privileged' stamp: 'vb 4/11/09 21:56'!
+restoreState: aBlock
+
+	aBlock value! !
+
+!RxMatcher methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
+initialize: syntaxTreeRoot ignoreCase: aBoolean
+	"Compile thyself for the regex with the specified syntax tree.
+	See comment and `building' protocol in this class and 
+	#dispatchTo: methods in syntax tree components for details 
+	on double-dispatch building. 
+	The argument is supposedly a RxsRegex."
+
+	ignoreCase := aBoolean.
+	self buildFrom: syntaxTreeRoot.
+	startOptimizer := RxMatchOptimizer new initialize: syntaxTreeRoot ignoreCase: aBoolean! !
 
 !RxMatcher methodsFor: 'double dispatch' stamp: 'KenD 11/25/2016 16:26:52'!
 syntaxAny
@@ -1546,29 +1485,6 @@ syntaxWordBoundary
 
 	^RxmSpecial new beWordBoundary! !
 
-!RxMatcher methodsFor: 'private' stamp: 'lr 1/15/2010 21:51'!
-tryMatch
-	"Match thyself against the current stream."
-
-	| oldMarkerPositions |
-	oldMarkerPositions := markerPositions.
-	markerPositions := Array new: markerCount.
-	1 to: markerCount do: [ :i | markerPositions at: i put: OrderedCollection new ].
-	lastResult := startOptimizer isNil
-		ifTrue: [ matcher matchAgainst: self]
-		ifFalse: [ (startOptimizer canStartMatch: stream peek in: self) and: [ matcher matchAgainst: self ] ].
-	"check for duplicates"
-	(lastResult not or: [ oldMarkerPositions isNil or: [ oldMarkerPositions size ~= markerPositions size ] ])
-		ifTrue: [ ^ lastResult ].
-	oldMarkerPositions with: markerPositions do: [ :oldPos :newPos |
-		oldPos size = newPos size 
-			ifFalse: [ ^ lastResult ].
-		oldPos with: newPos do: [ :old :new |
-			old = new
-				ifFalse: [ ^ lastResult ] ] ].
-	"this is a duplicate"
-	^ lastResult := false! !
-
 !RxMatcher class methodsFor: 'instance creation' stamp: 'vb 4/11/09 21:56'!
 for: aRegex
 	"Create and answer a matcher that will match a regular expression
@@ -1695,6 +1611,55 @@ characterSet
 		spec := spec, ']', (self inputUpTo: $] nestedOn: $[ errorMessage: errorMessage)].
 	^self characterSetFrom: spec! !
 
+!RxParser methodsFor: 'recursive descent' stamp: 'vb 4/11/09 21:56'!
+messagePredicate
+	"Match a message predicate specification: a selector (presumably
+	understood by a Character) enclosed in :'s ."
+
+	| spec negated |
+	spec := (self inputUpTo: $: errorMessage: ' no terminating ":"').
+	negated := false.
+	spec first = $^ ifTrue:
+		[negated := true.
+		spec := spec copyFrom: 2 to: spec size].
+	^RxsMessagePredicate new 
+		initializeSelector: spec asSymbol
+		negated: negated! !
+
+!RxParser methodsFor: 'recursive descent' stamp: 'vb 4/11/09 21:56'!
+piece
+	"<piece> ::= <atom> | <atom>* | <atom>+ | <atom>?"
+
+	| atom errorMessage |
+	errorMessage := ' nullable closure'.
+	atom := self atom.
+	lookahead = $* ifTrue: 
+		[self next.
+		atom isNullable ifTrue: [self signalParseError: errorMessage].
+		^RxsPiece new initializeStarAtom: atom].
+	lookahead = $+ ifTrue: 
+		[self next.
+		atom isNullable ifTrue: [self signalParseError: errorMessage].
+		^RxsPiece new initializePlusAtom: atom].
+	lookahead = $? ifTrue: 
+		[self next.
+		atom isNullable ifTrue: [self signalParseError: errorMessage].
+		^RxsPiece new initializeOptionalAtom: atom].
+	^RxsPiece new initializeAtom: atom! !
+
+!RxParser methodsFor: 'recursive descent' stamp: 'vb 4/11/09 21:56'!
+regex
+	"<regex> ::= e | <branch> `|' <regex>"
+
+	| branch regex |
+	branch := self branch.
+	(lookahead = #epsilon or: [lookahead = $)])
+		ifTrue: [regex := nil]
+		ifFalse: 
+			[self match: $|.
+			regex := self regex].
+	^RxsRegex new initializeBranch: branch regex: regex! !
+
 !RxParser methodsFor: 'private' stamp: 'vb 4/11/09 21:56'!
 characterSetFrom: setSpec
 	"<setSpec> is what goes between the brackets in a charset regex
@@ -1764,21 +1729,6 @@ match: aCharacter
 		ifTrue: [^self signalParseError].	"does not return"
 	self next! !
 
-!RxParser methodsFor: 'recursive descent' stamp: 'vb 4/11/09 21:56'!
-messagePredicate
-	"Match a message predicate specification: a selector (presumably
-	understood by a Character) enclosed in :'s ."
-
-	| spec negated |
-	spec := (self inputUpTo: $: errorMessage: ' no terminating ":"').
-	negated := false.
-	spec first = $^ ifTrue:
-		[negated := true.
-		spec := spec copyFrom: 2 to: spec size].
-	^RxsMessagePredicate new 
-		initializeSelector: spec asSymbol
-		negated: negated! !
-
 !RxParser methodsFor: 'private' stamp: 'vb 4/11/09 21:56'!
 next
 	"Advance the input storing the just read character
@@ -1787,6 +1737,16 @@ next
 	input atEnd
 		ifTrue: [lookahead := #epsilon]
 		ifFalse: [lookahead := input next]! !
+
+!RxParser methodsFor: 'private' stamp: 'vb 4/11/09 21:56'!
+signalParseError
+
+	self class signalSyntaxException: 'Regex syntax error'! !
+
+!RxParser methodsFor: 'private' stamp: 'vb 4/11/09 21:56'!
+signalParseError: aString
+
+	self class signalSyntaxException: aString! !
 
 !RxParser methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
 parse: aString
@@ -1811,50 +1771,6 @@ parseStream: aStream
 	tree := self regex.
 	self match: #epsilon.
 	^tree! !
-
-!RxParser methodsFor: 'recursive descent' stamp: 'vb 4/11/09 21:56'!
-piece
-	"<piece> ::= <atom> | <atom>* | <atom>+ | <atom>?"
-
-	| atom errorMessage |
-	errorMessage := ' nullable closure'.
-	atom := self atom.
-	lookahead = $* ifTrue: 
-		[self next.
-		atom isNullable ifTrue: [self signalParseError: errorMessage].
-		^RxsPiece new initializeStarAtom: atom].
-	lookahead = $+ ifTrue: 
-		[self next.
-		atom isNullable ifTrue: [self signalParseError: errorMessage].
-		^RxsPiece new initializePlusAtom: atom].
-	lookahead = $? ifTrue: 
-		[self next.
-		atom isNullable ifTrue: [self signalParseError: errorMessage].
-		^RxsPiece new initializeOptionalAtom: atom].
-	^RxsPiece new initializeAtom: atom! !
-
-!RxParser methodsFor: 'recursive descent' stamp: 'vb 4/11/09 21:56'!
-regex
-	"<regex> ::= e | <branch> `|' <regex>"
-
-	| branch regex |
-	branch := self branch.
-	(lookahead = #epsilon or: [lookahead = $)])
-		ifTrue: [regex := nil]
-		ifFalse: 
-			[self match: $|.
-			regex := self regex].
-	^RxsRegex new initializeBranch: branch regex: regex! !
-
-!RxParser methodsFor: 'private' stamp: 'vb 4/11/09 21:56'!
-signalParseError
-
-	self class signalSyntaxException: 'Regex syntax error'! !
-
-!RxParser methodsFor: 'private' stamp: 'vb 4/11/09 21:56'!
-signalParseError: aString
-
-	self class signalSyntaxException: aString! !
 
 !RxParser class methodsFor: 'DOCUMENTATION' stamp: 'vb 4/11/09 21:56'!
 a: x introduction: xx 
@@ -2613,14 +2529,6 @@ VisualAge:
 
 	self error: 'comment only'! !
 
-!RxParser class methodsFor: 'exception signaling' stamp: 'lr 11/4/2009 22:37'!
-doHandlingMessageNotUnderstood: aBlock
-	"MNU should be trapped and resignaled as a match error in a few places in the matcher.
-	This method factors out this dialect-dependent code to make porting easier."
-	^ aBlock
-		on: MessageNotUnderstood
-		do: [:ex | RxParser signalMatchException: 'invalid predicate selector']! !
-
 !RxParser class methodsFor: 'DOCUMENTATION' stamp: 'vb 4/11/09 21:56'!
 e: x implementationNotes: xx
 "	
@@ -2726,6 +2634,26 @@ It is provided to the Smalltalk community in hope it will be useful.
 
 	self error: 'comment only'! !
 
+!RxParser class methodsFor: 'exception signaling' stamp: 'lr 11/4/2009 22:37'!
+doHandlingMessageNotUnderstood: aBlock
+	"MNU should be trapped and resignaled as a match error in a few places in the matcher.
+	This method factors out this dialect-dependent code to make porting easier."
+	^ aBlock
+		on: MessageNotUnderstood
+		do: [:ex | RxParser signalMatchException: 'invalid predicate selector']! !
+
+!RxParser class methodsFor: 'exception signaling' stamp: 'avi 11/30/2003 13:25'!
+signalCompilationException: errorString
+	RegexCompilationError new signal: errorString! !
+
+!RxParser class methodsFor: 'exception signaling' stamp: 'avi 11/30/2003 13:25'!
+signalMatchException: errorString
+	RegexMatchingError new signal: errorString! !
+
+!RxParser class methodsFor: 'exception signaling' stamp: 'avi 11/30/2003 13:25'!
+signalSyntaxException: errorString
+	RegexSyntaxError new signal: errorString! !
+
 !RxParser class methodsFor: 'class initialization' stamp: 'avi 11/30/2003 13:26'!
 initialize
 	"self initialize"
@@ -2770,6 +2698,13 @@ parse: aString
 
 	^self new parse: aString! !
 
+!RxParser class methodsFor: 'utilities' stamp: 'avi 11/30/2003 13:23'!
+safelyParse: aString
+	"Parse the argument and return the result (the parse tree).
+	In case of a syntax error, return nil.
+	Exception handling here is dialect-dependent."
+	^ [self new parse: aString] on: RegexSyntaxError do: [:ex | nil]! !
+
 !RxParser class methodsFor: 'preferences' stamp: 'vb 4/11/09 21:56'!
 preferredMatcherClass
 	"The matcher to use. For now just one is available, but in
@@ -2779,25 +2714,6 @@ preferredMatcherClass
 	Parser is still more or less `central' thing in the whole package."
 
 	^RxMatcher! !
-
-!RxParser class methodsFor: 'utilities' stamp: 'avi 11/30/2003 13:23'!
-safelyParse: aString
-	"Parse the argument and return the result (the parse tree).
-	In case of a syntax error, return nil.
-	Exception handling here is dialect-dependent."
-	^ [self new parse: aString] on: RegexSyntaxError do: [:ex | nil]! !
-
-!RxParser class methodsFor: 'exception signaling' stamp: 'avi 11/30/2003 13:25'!
-signalCompilationException: errorString
-	RegexCompilationError new signal: errorString! !
-
-!RxParser class methodsFor: 'exception signaling' stamp: 'avi 11/30/2003 13:25'!
-signalMatchException: errorString
-	RegexMatchingError new signal: errorString! !
-
-!RxParser class methodsFor: 'exception signaling' stamp: 'avi 11/30/2003 13:25'!
-signalSyntaxException: errorString
-	RegexSyntaxError new signal: errorString! !
 
 !RxmLink methodsFor: 'matching' stamp: 'vb 4/11/09 21:56'!
 matchAgainst: aMatcher
@@ -2923,6 +2839,15 @@ bePerformNot: aSelector
 		[:char | 
 		RxParser doHandlingMessageNotUnderstood: [(char perform: aSelector) not]]! !
 
+!RxmPredicate methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
+predicate: aBlock
+	"This link will match any single character for which <aBlock>
+	evaluates to true."
+
+	aBlock numArgs ~= 1 ifTrue: [self error: 'bad predicate block'].
+	predicate := aBlock.
+	^self! !
+
 !RxmPredicate methodsFor: 'matching' stamp: 'vb 4/11/09 21:56'!
 matchAgainst: aMatcher
 	"Match if the predicate block evaluates to true when given the
@@ -2937,15 +2862,6 @@ matchAgainst: aMatcher
 		ifFalse:
 			[aMatcher restoreState: original.
 			^false]! !
-
-!RxmPredicate methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
-predicate: aBlock
-	"This link will match any single character for which <aBlock>
-	evaluates to true."
-
-	aBlock numArgs ~= 1 ifTrue: [self error: 'bad predicate block'].
-	predicate := aBlock.
-	^self! !
 
 !RxmPredicate class methodsFor: 'instance creation' stamp: 'vb 4/11/09 21:56'!
 with: unaryBlock
@@ -3012,6 +2928,13 @@ initialize
 	super initialize.
 	self beCaseSensitive! !
 
+!RxmSubstring methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
+substring: aString ignoreCase: aBoolean
+	"Match exactly this string."
+
+	sample := aString.
+	aBoolean ifTrue: [self beCaseInsensitive]! !
+
 !RxmSubstring methodsFor: 'matching' stamp: 'vb 4/11/09 21:56'!
 matchAgainst: aMatcher
 	"Match if my sample stream is exactly the current prefix
@@ -3034,13 +2957,6 @@ matchAgainst: aMatcher
 sampleStream
 
 	^sample readStream! !
-
-!RxmSubstring methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
-substring: aString ignoreCase: aBoolean
-	"Match exactly this string."
-
-	sample := aString.
-	aBoolean ifTrue: [self beCaseInsensitive]! !
 
 !RxmTerminator methodsFor: 'matching' stamp: 'vb 4/11/09 21:56'!
 matchAgainst: aStream
@@ -3100,6 +3016,11 @@ dispatchTo: aMatcher
 
 	^aMatcher syntaxBranch: self! !
 
+!RxsBranch methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
+piece
+
+	^piece! !
+
 !RxsBranch methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
 initializePiece: aPiece branch: aBranch
 	"See class comment for instance variables description."
@@ -3111,11 +3032,6 @@ initializePiece: aPiece branch: aBranch
 isNullable
 
 	^piece isNullable and: [branch isNil or: [branch isNullable]]! !
-
-!RxsBranch methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
-piece
-
-	^piece! !
 
 !RxsBranch methodsFor: 'optimization' stamp: 'vb 4/11/09 21:56'!
 tryMergingInto: aStream
@@ -3137,6 +3053,30 @@ dispatchTo: aMatcher
 	will do whatever it has to."
 
 	^aMatcher syntaxCharSet: self! !
+
+!RxsCharSet methodsFor: 'accessing' stamp: 'KenD 11/25/2016 16:32:49'!
+hasPredicates
+
+	^elements anySatisfy: [:some | some isEnumerable not]! !
+
+!RxsCharSet methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
+predicateIgnoringCase: aBoolean
+
+	| predicate enumerable |
+	enumerable := self enumerablePartPredicateIgnoringCase: aBoolean.
+	^self hasPredicates
+		ifFalse: [enumerable]
+		ifTrue:
+			[predicate := self predicatePartPredicate.
+			negated
+				ifTrue: [[:char | (enumerable value: char) and: [predicate value: char]]]
+				ifFalse: [[:char | (enumerable value: char) or: [predicate value: char]]]]! !
+
+!RxsCharSet methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
+predicates
+
+	^(elements reject: [:some | some isEnumerable])
+		collect: [:each | each predicate]! !
 
 !RxsCharSet methodsFor: 'privileged' stamp: 'vb 4/11/09 21:56'!
 enumerablePartPredicateIgnoringCase: aBoolean
@@ -3160,29 +3100,6 @@ enumerableSetIgnoringCase: aBoolean
 			[each enumerateTo: set ignoringCase: aBoolean]].
 	^set! !
 
-!RxsCharSet methodsFor: 'accessing' stamp: 'KenD 11/25/2016 16:32:49'!
-hasPredicates
-
-	^elements anySatisfy: [:some | some isEnumerable not]! !
-
-!RxsCharSet methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
-initializeElements: aCollection negated: aBoolean
-	"See class comment for instance variables description."
-
-	elements := aCollection.
-	negated := aBoolean! !
-
-!RxsCharSet methodsFor: 'testing' stamp: 'vb 4/11/09 21:56'!
-isEnumerable
-
-	elements detect: [:some | some isEnumerable not] ifNone: [^true].
-	^false! !
-
-!RxsCharSet methodsFor: 'testing' stamp: 'vb 4/11/09 21:56'!
-isNegated
-
-	^negated! !
-
 !RxsCharSet methodsFor: 'privileged' stamp: 'lr 11/4/2009 22:27'!
 optimalSetIgnoringCase: aBoolean
 	"Assuming the client with search the `set' using #includes:,
@@ -3195,19 +3112,6 @@ optimalSetIgnoringCase: aBoolean
 	^set size < 10
 		ifTrue: [set asArray]
 		ifFalse: [set]! !
-
-!RxsCharSet methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
-predicateIgnoringCase: aBoolean
-
-	| predicate enumerable |
-	enumerable := self enumerablePartPredicateIgnoringCase: aBoolean.
-	^self hasPredicates
-		ifFalse: [enumerable]
-		ifTrue:
-			[predicate := self predicatePartPredicate.
-			negated
-				ifTrue: [[:char | (enumerable value: char) and: [predicate value: char]]]
-				ifFalse: [[:char | (enumerable value: char) or: [predicate value: char]]]]! !
 
 !RxsCharSet methodsFor: 'privileged' stamp: 'KenD 11/22/2016 13:09:41'!
 predicatePartPredicate
@@ -3229,11 +3133,23 @@ predicatePartPredicate
 		ifTrue:
 			[[:char | (predicates includes: [:some | some value: char]) not]]! !
 
-!RxsCharSet methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
-predicates
+!RxsCharSet methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
+initializeElements: aCollection negated: aBoolean
+	"See class comment for instance variables description."
 
-	^(elements reject: [:some | some isEnumerable])
-		collect: [:each | each predicate]! !
+	elements := aCollection.
+	negated := aBoolean! !
+
+!RxsCharSet methodsFor: 'testing' stamp: 'vb 4/11/09 21:56'!
+isEnumerable
+
+	elements detect: [:some | some isEnumerable not] ifNone: [^true].
+	^false! !
+
+!RxsCharSet methodsFor: 'testing' stamp: 'vb 4/11/09 21:56'!
+isNegated
+
+	^negated! !
 
 !RxsCharacter methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
 character
@@ -3356,6 +3272,16 @@ dispatchTo: aBuilder
 
 	^aBuilder syntaxMessagePredicate: self! !
 
+!RxsMessagePredicate methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
+negated
+
+	^negated! !
+
+!RxsMessagePredicate methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
+selector
+
+	^selector! !
+
 !RxsMessagePredicate methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
 initializeSelector: aSelector
 	"The selector must be a one-argument message understood by Character."
@@ -3368,16 +3294,6 @@ initializeSelector: aSelector negated: aBoolean
 
 	selector := aSelector.
 	negated := aBoolean! !
-
-!RxsMessagePredicate methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
-negated
-
-	^negated! !
-
-!RxsMessagePredicate methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
-selector
-
-	^selector! !
 
 !RxsPiece methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
 atom
@@ -3398,6 +3314,17 @@ dispatchTo: aMatcher
 	will do whatever it has to."
 
 	^aMatcher syntaxPiece: self! !
+
+!RxsPiece methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
+max
+	"The value answered may be nil, indicating infinity."
+
+	^max! !
+
+!RxsPiece methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
+min
+
+	^min! !
 
 !RxsPiece methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
 initializeAtom: anAtom
@@ -3467,17 +3394,6 @@ isSingular
 isStar
 
 	^min = 0 and: [max == nil]! !
-
-!RxsPiece methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
-max
-	"The value answered may be nil, indicating infinity."
-
-	^max! !
-
-!RxsPiece methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
-min
-
-	^min! !
 
 !RxsPredicate methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
 beAlphaNumeric
@@ -3589,25 +3505,6 @@ dispatchTo: anObject
 
 	^anObject syntaxPredicate: self! !
 
-!RxsPredicate methodsFor: 'testing' stamp: 'vb 4/11/09 21:56'!
-isAtomic
-	"A predicate is a single character but the character is not known in advance."
-
-	^false! !
-
-!RxsPredicate methodsFor: 'testing' stamp: 'vb 4/11/09 21:56'!
-isEnumerable
-
-	^false! !
-
-!RxsPredicate methodsFor: 'private' stamp: 'vb 4/11/09 21:56'!
-negate
-
-	| tmp |
-	tmp := predicate.
-	predicate := negation.
-	negation := tmp! !
-
 !RxsPredicate methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
 negated
 
@@ -3627,6 +3524,25 @@ predicateNegation
 value: aCharacter
 
 	^predicate value: aCharacter! !
+
+!RxsPredicate methodsFor: 'testing' stamp: 'vb 4/11/09 21:56'!
+isAtomic
+	"A predicate is a single character but the character is not known in advance."
+
+	^false! !
+
+!RxsPredicate methodsFor: 'testing' stamp: 'vb 4/11/09 21:56'!
+isEnumerable
+
+	^false! !
+
+!RxsPredicate methodsFor: 'private' stamp: 'vb 4/11/09 21:56'!
+negate
+
+	| tmp |
+	tmp := predicate.
+	predicate := negation.
+	negation := tmp! !
 
 !RxsPredicate class methodsFor: 'instance creation' stamp: 'vb 4/11/09 21:56'!
 forEscapedLetter: aCharacter
@@ -3724,6 +3640,10 @@ dispatchTo: aMatcher
 
 	^aMatcher syntaxRegex: self! !
 
+!RxsRegex methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
+regex
+	^regex! !
+
 !RxsRegex methodsFor: 'initialize-release' stamp: 'vb 4/11/09 21:56'!
 initializeBranch: aBranch regex: aRegex
 	"See class comment for instance variable description."
@@ -3736,9 +3656,98 @@ isNullable
 
 	^branch isNullable or: [regex notNil and: [regex isNullable]]! !
 
-!RxsRegex methodsFor: 'accessing' stamp: 'vb 4/11/09 21:56'!
-regex
-	^regex! !
+!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:31'!
+allRangesOfRegexMatches: rxString
+
+	^rxString asRegex matchingRangesIn: self! !
+
+!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:32'!
+allRegexMatches: rxString
+
+	^rxString asRegex matchesIn: self! !
+
+!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:32'!
+asRegex
+	"Compile the receiver as a regex matcher. May raise RxParser>>syntaxErrorSignal
+	or RxParser>>compilationErrorSignal.
+	This is a part of the Regular Expression Matcher package, (c) 1996, 1999 Vassili Bykov.
+	Refer to `documentation' protocol of RxParser class for details."
+
+	^RxParser preferredMatcherClass for: (RxParser new parse: self)! !
+
+!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:33'!
+asRegexIgnoringCase
+	"Compile the receiver as a regex matcher. May raise RxParser>>syntaxErrorSignal
+	or RxParser>>compilationErrorSignal.
+	This is a part of the Regular Expression Matcher package, (c) 1996, 1999 Vassili Bykov.
+	Refer to `documentation' protocol of RxParser class for details."
+
+	^RxParser preferredMatcherClass
+		for: (RxParser new parse: self)
+		ignoreCase: true! !
+
+!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:33'!
+copyWithRegex: rxString matchesReplacedWith: aString
+
+	^rxString asRegex
+		copy: self replacingMatchesWith: aString! !
+
+!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:33'!
+copyWithRegex: rxString matchesTranslatedUsing: aBlock
+
+	^rxString asRegex
+		copy: self translatingMatchesUsing: aBlock! !
+
+!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:34'!
+matchesRegex: regexString
+	"Test if the receiver matches a regex.  May raise RxParser>>regexErrorSignal or
+	child signals.
+	This is a part of the Regular Expression Matcher package, (c) 1996, 1999 Vassili Bykov.
+	Refer to `documentation' protocol of RxParser class for details."
+
+	^regexString asRegex matches: self! !
+
+!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:34'!
+matchesRegexIgnoringCase: regexString
+	"Test if the receiver matches a regex.  May raise RxParser>>regexErrorSignal or
+	child signals.
+	This is a part of the Regular Expression Matcher package, (c) 1996, 1999 Vassili Bykov.
+	Refer to `documentation' protocol of RxParser class for details."
+
+	^regexString asRegexIgnoringCase matches: self! !
+
+!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:34'!
+prefixMatchesRegex: regexString
+	"Test if the receiver's prefix matches a regex.	
+	May raise RxParser class>>regexErrorSignal or child signals.
+	This is a part of the Regular Expression Matcher package, (c) 1996, 1999 Vassili Bykov.
+	Refer to `documentation' protocol of RxParser class for details."
+
+	^regexString asRegex matchesPrefix: self! !
+
+!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:35'!
+prefixMatchesRegexIgnoringCase: regexString
+	"Test if the receiver's prefix matches a regex.	
+	May raise RxParser class>>regexErrorSignal or child signals.
+	This is a part of the Regular Expression Matcher package, (c) 1996, 1999 Vassili Bykov.
+	Refer to `documentation' protocol of RxParser class for details."
+
+	^regexString asRegexIgnoringCase matchesPrefix: self! !
+
+!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:35'!
+regex: rxString matchesCollect: aBlock
+
+	^rxString asRegex matchesIn: self collect: aBlock! !
+
+!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:35'!
+regex: rxString matchesDo: aBlock
+
+	^rxString asRegex matchesIn: self do: aBlock! !
+
+!String methodsFor: '*Regex-Core' stamp: 'gsa 12/20/2012 10:36'!
+search: aString
+	"compatibility method to make regexp and strings work polymorphicly"
+	^ aString includesSubString: self! !
 RxMatcher initialize!
 RxParser initialize!
 RxsPredicate initialize!
