@@ -3,7 +3,7 @@ Cuis-Smalltalk-RegEx
 
 Regular Expressions for Cuis.
 
-Tested in Cuis 5.0 rev 2984
+Tested in Cuis 5.0 rev 4438
 
 This is a port of Vassili Bykov's regular expression parser.
 
